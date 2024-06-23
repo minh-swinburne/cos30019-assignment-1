@@ -18,7 +18,7 @@ This is the source code for the Assignment 1 of course unit COS30019 - Introduct
   * Iterative Deepening Depth-First Search (IDDFS)
 * Informed search algorithms:
   * A* Search
-  * Greedy Best-First Search
+  * Greedy Best-First Search (GBFS)
   * Bidirectional A* Search
 
 ## Installation and Running
@@ -47,9 +47,19 @@ This is the source code for the Assignment 1 of course unit COS30019 - Introduct
   ```
   python search.py help
   ```
-  It will show lists of names for available search algorithms, map files, and optional tags. Allowed tags are:
+  It will show lists of names for available search algorithms, map files, and optional tags.
 
-  > - -a: Search all goals
-  > - -j: Agent can jump over obstacles
-  > - -l: Limit of visited cells for IDDFS (or you can specify this when prompted afterwards)
-  >
+  ### Algorithm names
+
+  - `bfs` for BFS
+  - `dfs` for DFS
+  - `iddfs` for IDDFS
+  - `greedy` for GBFS
+  - `astar` for A* Search
+  - `bidirectional` for Bidirectional A* Search
+
+  ### Optional tags
+  
+  - `-a`: Search all goals
+  - `-j`: Agent can jump over obstacles
+  - `-l`: Limit of visited cells for IDDFS (or you can specify this when prompted afterwards)
