@@ -8,7 +8,7 @@ from importlib import import_module
 
 ALLOWED_TAGS = {
     "-a": "Search all goals",
-    "-j": "Jump point search",
+    "-j": "Agent can jump over obstacles",
     "-l": "Limit of visited cells for IDDFS (or you can specify this when prompted afterwards)"
 }
 
