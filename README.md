@@ -42,7 +42,7 @@ This is the source code for the Assignment 1 of course unit COS30019 - Introduct
   ```
   python search.py RobotNav-test.txt bfs
   ```
-  Output follows the standard stated in the assignment instruction. For help and more information, running the command:
+  Output follows the standard stated in the assignment instruction. For help and more information, run the command:
 
   ```
   python search.py help
