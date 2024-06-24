@@ -14,7 +14,7 @@ Breadth-First Search (BFS) Algorithm (uninformed)
 from collections import deque
 
 
-def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
+def search(agent:'Agent', all:bool=False) -> dict[str, list[str] | 'Cell' | int] | int:
     """
     Perform breadth-first search to find the shortest path from the agent's location to the nearest goal or all goals.
 
