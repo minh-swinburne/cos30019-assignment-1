@@ -51,15 +51,16 @@ This is the source code for the Assignment 1 of course unit COS30019 - Introduct
 
   ### Algorithm names
 
+
   - `bfs` for BFS
   - `dfs` for DFS
   - `iddfs` for IDDFS
   - `greedy` for GBFS
   - `astar` for A* Search
-  - `bidirectional` for Bidirectional A* Search
+  - `bi_astar` for Bidirectional A* Search
 
   ### Optional tags
-  
+
   - `-a`: Search all goals
   - `-j`: Agent can jump over obstacles
   - `-l`: Limit of visited cells for IDDFS (or you can specify this when prompted afterwards)

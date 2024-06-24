@@ -2,7 +2,7 @@
 A* Search Algorithm (informed)
 
 ## Functions:
-    - search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int: Perform A* search to find the shortest path from the agent's location to the seemingly nearest goal (estimated based on Manhattan distance) or all goals.
+    - search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int: Perform A* search to find the shortest path from the agent's location to the seemingly nearest goal (estimated based on Manhattan distance) or all goals.
   
 ## Main idea:
     The A* search algorithm is an informed search algorithm that uses a heuristic function to estimate the cost of reaching the goal from a given cell. It combines the cost of reaching a cell `g` and the estimated cost of reaching the goal from that cell `h` to determine the priority of exploring the cell. The algorithm uses a priority queue to keep track of the cells to be explored.
@@ -11,10 +11,11 @@ A* Search Algorithm (informed)
     
     The algorithm can be used to find the shortest path to the seemingly nearest goal or all goals in the grid. If the agent can jump over obstacles, the algorithm will consider all valid neighbors of the current cell, and then choose the neighbor with the lowest `f` value (`g + h`) as the next cell.
 """
-import heapq, tracemalloc
+import heapq
+from classes import *
 
 
-def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
+def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int:
     """
     Perform A* search (informed) to find the shortest path from the agent's location to the goal.
 
@@ -48,7 +49,7 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
     start.h = start.manhattan_distance(goal)
 
     # open_list = [start] # Use a list as a priority queue
-    open_list:list['Cell'] = [] # Use a heap as a priority queue
+    open_list:list[Cell] = [] # Use a heap as a priority queue
     heapq.heappush(open_list, start)
     closed_set = set()
 
@@ -57,7 +58,6 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
     path = []
     goals = set(agent.goals)
     reached_goals = []
-    inner_count = 0
 
     while open_list:
         # Get the cell with the lowest f value
@@ -65,15 +65,6 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
         # open_list.remove(current)
         current = heapq.heappop(open_list)
         closed_set.add(current)
-        # if False and all and agent.can_jump and count > 17500:
-        #     print("Updating current cell...")
-        #     print(f"Count: {count}, Inner Count: {inner_count}, Open List ({len(open_list)}), Closed Set ({len(closed_set)}), Current: {current} - g: {current.g}, h: {current.h}, Parent: {current.parent}")
-        #     print("Memory:", tracemalloc.get_traced_memory())
-            
-            # print("Resetting the inner count to 0...\n")
-        inner_count = 0
-        # if agent.can_jump:
-        #     print(f"Open List: {open_list} - Current: {current} - Parent: {current.parent}")
 
         if current in goals:
             reached_goals.append(current)
@@ -104,18 +95,12 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
             # print("Next goal:", goal)
             continue
 
-        # neighbors = agent.grid.get_neighbors(current, agent.can_jump)
-        # print(f"Current: {current} - g: {current.g}, h: {current.h}, Parent: {current.parent}, Neighbors: {", ".join([f"{neighbor} (g: {neighbor.g}, h: {neighbor.h})" for neighbor in neighbors])}")
         for neighbor in agent.grid.get_neighbors(current, agent.can_jump):
-            inner_count += 1
             if neighbor in closed_set:
                 continue
-            # if all and agent.can_jump and count % 1000 == 0:
-            #     print(f"Visited {count} cells")
 
             tentative_g = current.g + current.jump_cost(neighbor)
             if neighbor not in open_list:
-                # print("Current:", current, "Neighbor:", neighbor)
                 # Increment the counter for each visited cell
                 count += 1
                 # Update the g and h values for the neighbor cell
@@ -128,7 +113,6 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
                 heapq.heappush(open_list, neighbor)
             elif tentative_g < neighbor.g:
                 # Update the neighbor's g value
-                # print(f"Current: {current}, Neighbor: {neighbor} (Parent: {neighbor.parent}), Tentative g: {tentative_g}, Neighbor g: {neighbor.g}, Count: {count}")
                 neighbor.g = tentative_g
                 neighbor.parent = current
                 # Reheapify the open list after updating the g value

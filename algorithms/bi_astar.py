@@ -1,9 +1,9 @@
 """
-Bidirectional search algorithm (informed)
+Bidirectional A* Search algorithm (informed)
 
 ## Functions:
-    - connect(agent: 'Agent', start: 'Cell', goal: 'Cell') -> None: Connect the path from the start cell to the goal cell.
-    - search(agent: 'Agent') -> dict[list[str], 'Cell', int] | int: Perform bidirectional A* search to find the shortest path from the agent's location to the (seemingly) nearest goal.
+    - connect(agent:Agent, start:Cell, goal:Cell) -> None: Connect the path from the start cell to the goal cell.
+    - search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int: Perform bidirectional A* search to find the shortest path from the agent's location to the (seemingly) nearest goal.
   
 ## Main idea:
     The bidirectional A* search algorithm is an informed search algorithm that explores the search space from both the start and goal cells simultaneously. It uses two open lists to keep track of the cells to be explored from the start and goal cells. The algorithm continues until it finds a common cell in both open lists or one of the open lists is empty.
@@ -11,25 +11,30 @@ Bidirectional search algorithm (informed)
     For each cell, the algorithm explores all its neighbors (in the order of up, left, down, right) and adds them to the open list if they are not blocked and have not been visited yet. The algorithm continues until it finds a common cell in both open lists or one of the open lists is empty.
 """
 import heapq
+from classes import *
 
 
-def connect(agent:'Agent', start:'Cell', goal:'Cell'):
+def connect(agent:Agent, start:Cell, goal:Cell):
     """
     Connect the path from the start cell to the goal cell. This is dedicated to find the best path from a cell to its neighbor when the agent can jump, instead of just jumping regardless of cost.
     
     Bidirectional A* Search Algorithm checks for a collapse of the two open lists when iterating each of their neighbors instead of checking the current cells. This can be a problem when the agent can jump, as the agent may jump from a cell straight to its neighbor when it finds collapse with distance greater than 1 instead of choosing the cell with smallest `f` value as in A*. This function is used to connect the path from the current cell to that possibly far neighbor cell, ensuring that the agent takes the best path by setting appropriate parent cells.
+    
+    If the start and goal cells are the same, the function returns immediately without doing anything.
 
     ### Args:
-        - agent (Agent): The agent object. Should be able to jump.
+        - agent (Agent): The agent object. Can or cannot jump over obstacles.
         - start (Cell): The start cell.
         - goal (Cell): The goal cell, which is actually a neighbor.
 
     ### Returns:
         None
     """
+    if start == goal:
+        return
     if agent.can_jump:
         direction = goal - start
-        neighbors:list['Cell'] = []
+        neighbors:list[Cell] = []
         neighbor = agent.grid.get_neighbor(start, direction)
         while neighbor is not None and neighbor != goal:
             if not neighbor.blocked:
@@ -50,7 +55,7 @@ def connect(agent:'Agent', start:'Cell', goal:'Cell'):
     goal.parent = start
 
 
-def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
+def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int:
     """
     Perform bidirectional A* search to find the shortest path from the agent's location to the goal.
 
@@ -86,9 +91,9 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
     # open_list_goal = [goal]
 
     # Use a heap as a priority queue
-    open_list_start:list['Cell'] = []
+    open_list_start:list[Cell] = []
     heapq.heappush(open_list_start, start)
-    open_list_goal:list['Cell'] = []
+    open_list_goal:list[Cell] = []
     heapq.heappush(open_list_goal, goal)
 
     closed_set_start = set()
@@ -99,6 +104,10 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
     path = []
     goals = set(agent.goals)
     reached_goals = []
+    
+    collapse_start = collapse_goal = None
+    parents_start:dict[Cell, Cell] = {}
+    parents_goal:dict[Cell, Cell] = {}
 
     while open_list_start and open_list_goal:
         # Update the current start and goal cells
@@ -108,85 +117,62 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
         # open_list_goal.remove(current_goal)
         current_start = heapq.heappop(open_list_start)
         current_goal = heapq.heappop(open_list_goal)
+        
+        if current_goal.location in [(4,2)]:
+            pass
+        
         closed_set_start.add(current_start)
         closed_set_goal.add(current_goal)
         
-        found_goal = False
-
-        # print(f"Open List Start: {open_list_start} - Open List Goal: {open_list_goal}")
-        # print(f"Current Start: {current_start} <= {current_start.parent} - Current Goal: {current_goal} <= {current_goal.parent}")
-
-        # Explore the neighbors of the current start
-        for neighbor in agent.grid.get_neighbors(current_start, agent.can_jump):
-            if neighbor in closed_set_start:
-                continue
-
-            tentative_g = current_start.g + current_start.jump_cost(neighbor)
-            if neighbor not in open_list_start:
-                count += 1
-                if neighbor.parent:  # If the neighbor has a parent, a path is found
-                    # print("Tracing path from current start:", current_start, "to", neighbor)
-                    found_goal = True
-                    start.parent = goal.parent = None
-                    # Extend the path
-                    connect(agent, neighbor.parent, neighbor)
-                    path_goal = agent.trace_path(neighbor, backward=False)
-                    # neighbor.parent = current_start
-                    connect(agent, current_start, neighbor)
-                    path_start = agent.trace_path(neighbor)
-                    path.extend(path_start + path_goal)
-                    break
-                # Update the g and h values, and parent for the neighbor cell
-                neighbor.g = tentative_g
-                neighbor.h = neighbor.manhattan_distance(goal)
-                neighbor.parent = current_start
-                # Add the neighbor to the open list
-                # open_list_start.append(neighbor)
-                heapq.heappush(open_list_start, neighbor)
-            elif tentative_g < neighbor.g:
-                neighbor.g = tentative_g
-                neighbor.parent = current_start
-                # Reheapify the open list after updating the g value
-                heapq.heapify(open_list_start)
-
-        for neighbor in agent.grid.get_neighbors(current_goal, agent.can_jump):
-            if neighbor in closed_set_goal:
-                continue
-
-            tentative_g = current_goal.g + current_goal.jump_cost(neighbor)
-            if neighbor not in open_list_goal:
-                count += 1
-                if neighbor.parent and not found_goal:
-                    # print("Tracing path from current goal:", current_goal, "to", neighbor)
-                    found_goal = True
-                    start.parent = goal.parent = None
-                    # Extend the path
-                    connect(agent, neighbor.parent, neighbor)
-                    path_start = agent.trace_path(neighbor)
-                    # neighbor.parent = current_goal
-                    connect(agent, current_goal, neighbor)
-                    path_goal = agent.trace_path(neighbor, backward=False)
-                    path.extend(path_start + path_goal)
-                    break
-                neighbor.g = tentative_g
-                neighbor.h = neighbor.manhattan_distance(start)
-                neighbor.parent = current_goal
-                # open_list_goal.append(neighbor)
-                heapq.heappush(open_list_goal, neighbor)
-            elif tentative_g < neighbor.g:
-                neighbor.g = tentative_g
-                neighbor.parent = current_goal
-                heapq.heapify(open_list_goal)
+        if current_start in closed_set_goal:
+            collapse_start = current_start
+            if current_start in parents_goal:
+                collapse_goal = parents_goal[current_start]
+            else:
+                collapse_goal = current_start
+        if current_goal in closed_set_start:
+            if current_goal in parents_start:
+                collapse_start = parents_start[current_goal]
+                collapse_goal = current_goal
+            elif collapse_start == goal:
+                # print("Current Goal:", current_goal, "Current Start:", current_start, "Collapse Start:", collapse_start, "Collapse Goal:", collapse_goal)
+                collapse_start = current_goal
+            if collapse_goal is None:
+                collapse_goal = current_start
+        elif current_start in parents_start:
+            collapse_start = parents_start[current_start]
+            collapse_goal = current_start
+        elif current_goal in parents_goal:
+            collapse_goal = parents_goal[current_goal]
+            collapse_start = current_goal
+        
         # If a goal is found, reset the search state for the next goal
-        if found_goal:
+        if collapse_start is not None or collapse_goal is not None:
             reached_goals.append(goal)
             goals.remove(goal)
+            start.parent = goal.parent = None
+            
+            if collapse_start != collapse_goal:
+                if collapse_start is not None and collapse_start.parent in parents_start:
+                    collapse_start.parent.parent = parents_start[collapse_start.parent]
+                if collapse_goal is not None and collapse_goal.parent in parents_goal:
+                    collapse_goal.parent.parent = parents_goal[collapse_goal.parent]
+                
+                path_start = agent.trace_path(collapse_start)
+                connect(agent, collapse_goal, collapse_start)
+                path_goal = agent.trace_path(collapse_start, backward=False)
+                path.extend(path_start + path_goal)
+            else:
+                pass
+            
             if not all or not goals:
                 return {
                     'path': path,
                     'goal': reached_goals if all else goal,
                     'count': count
                 }
+            
+            # Reset the search state for the next goal
             agent.grid.reset()
             start = goal
             goal = min(goals, key=start.manhattan_distance)
@@ -199,6 +185,57 @@ def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
             open_list_goal = []
             heapq.heappush(open_list_goal, goal)
             closed_set_goal = set()
+            
+            collapse_start = collapse_goal = None
+            parents_start = {}
+            parents_goal = {}
+            continue
+
+        # Explore the neighbors of the current start
+        for neighbor in agent.grid.get_neighbors(current_start, agent.can_jump):
+            if neighbor in closed_set_start:
+                continue
+
+            tentative_g = current_start.g + current_start.jump_cost(neighbor)
+            if neighbor not in open_list_start:
+                count += 1
+                # Update the g and h values, and parent for the neighbor cell
+                neighbor.g = tentative_g
+                neighbor.h = neighbor.manhattan_distance(goal)
+                if neighbor.parent is not None and neighbor.parent in closed_set_goal:
+                    parents_goal[neighbor] = neighbor.parent
+                neighbor.parent = current_start
+                # Add the neighbor to the open list
+                # open_list_start.append(neighbor)
+                heapq.heappush(open_list_start, neighbor)
+            elif tentative_g < neighbor.g:
+                neighbor.g = tentative_g
+                if neighbor.parent is not None and neighbor.parent in closed_set_goal:
+                    parents_goal[neighbor] = neighbor.parent
+                neighbor.parent = current_start
+                # Reheapify the open list after updating the g value
+                heapq.heapify(open_list_start)
+
+        for neighbor in agent.grid.get_neighbors(current_goal, agent.can_jump):
+            if neighbor in closed_set_goal:
+                continue
+
+            tentative_g = current_goal.g + current_goal.jump_cost(neighbor)
+            if neighbor not in open_list_goal:
+                count += 1
+                neighbor.g = tentative_g
+                neighbor.h = neighbor.manhattan_distance(start)
+                if neighbor.parent is not None and neighbor.parent in closed_set_start:
+                    parents_start[neighbor] = neighbor.parent
+                neighbor.parent = current_goal
+                # open_list_goal.append(neighbor)
+                heapq.heappush(open_list_goal, neighbor)
+            elif tentative_g < neighbor.g:
+                neighbor.g = tentative_g
+                if neighbor.parent is not None and neighbor.parent in closed_set_start:
+                    parents_start[neighbor] = neighbor.parent
+                neighbor.parent = current_goal
+                heapq.heapify(open_list_goal)
     # If no path is found, return the count of visited cells
     return count
 
@@ -227,11 +264,13 @@ agent.can_jump = True
     from utils import *
 
     maps = []
+    # maps.append("map_2.txt")
     # maps.append("map_5.txt")
+    # maps.append("map_6.txt")
     # maps.append("map_7.txt")
     # maps.append("map_8.txt")
-    maps.append("map_9.txt")
-    # maps = get_available_maps()
+    # maps.append("map_9.txt")
+    maps = get_available_maps()
     for file in maps:
         print(file)
         grid_size, agent_loc, goal_locs, walls = load_map(file)
@@ -247,23 +286,29 @@ agent = Agent(grid_map, agent_loc, goal_locs)
         number = 10
         
         result = search(agent)
-        print("Search:", result)
-        print(f"Time: {timeit.timeit("search(agent)", setup=setup+setup_2, number=number)*1000/number} milliseconds (average of {number} runs)\n")
-        
-        # result = search_all(agent)
-        # print("Search All (Old):", result)
+        print("\nSearch:", result)
+        if type(result) == dict:
+            print("Goal:", agent.traverse_path(result['path']))
+        # print(f"Time: {timeit.timeit("search(agent)", setup=setup+setup_2, number=number)*1000/number} milliseconds (average of {number} runs)")
         
         result = search(agent, all=True)
-        print("Search All:", result)
-        print(f"Time: {timeit.timeit("search(agent, all=True)", setup=setup+setup_2, number=number)*1000/number} milliseconds (average of {number} runs)\nPath Length: {len(result['path']) if type(result) == dict else 0}\n")
+        print("\nSearch All:", result)
+        if type(result) == dict:
+            print("Goal:", agent.traverse_path(result['path']))
+        # print(f"Time: {timeit.timeit("search(agent, all=True)", setup=setup+setup_2, number=number)*1000/number} milliseconds (average of {number} runs)\nPath Length: {len(result['path']) if type(result) == dict else 0}")
         
         print("Enabled Jumping\n")
         agent.can_jump = True
         result = search(agent)
-        print("Search:", result)
-        print(f"Time: {timeit.timeit("search(agent)", setup=setup+setup_2+setup_3, number=number)*1000/number} milliseconds (average of {number} runs)\n")
+        print("\nSearch:", result)
+        if type(result) == dict:
+            print("Goal:", agent.traverse_path(result['path']))
+        # print(f"Time: {timeit.timeit("search(agent)", setup=setup+setup_2+setup_3, number=number)*1000/number} milliseconds (average of {number} runs)")
         
         result = search(agent, all=True)
-        print("Search All:", result)
-        print(f"Time: {timeit.timeit("search(agent, all=True)", setup=setup+setup_2+setup_3, number=number)*1000/number} milliseconds (average of {number} runs)\n")
+        print("\nSearch All:", result)
+        if type(result) == dict:
+            print("Goal:", agent.traverse_path(result['path']))
+        # print(f"Time: {timeit.timeit("search(agent, all=True)", setup=setup+setup_2+setup_3, number=number)*1000/number} milliseconds (average of {number} runs)")
+        
         # break

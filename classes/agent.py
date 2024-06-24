@@ -19,7 +19,7 @@ class Agent:
     def __init__(self, grid:Grid, location:tuple[int, int], goals:list[tuple[int, int]], can_jump=False):
         self.grid = grid
         self.cell = grid.get_cell(location)
-        self.goals:list['Cell'] = []
+        self.goals:list[Cell] = []
         for goal in goals:
             cell = self.grid.get_cell(goal)
             self.goals.append(cell)
@@ -51,6 +51,26 @@ class Agent:
             cell = cell.parent
         # print(f"Total Cost: {total_cost}")
         return path
+    
+    def traverse_path(self, path:list[str]) -> Cell:
+        """
+        Traverse the path from the start cell to the goal cell.
+
+        ### Args:
+            - path (list[str]): A list of Direction values (up, down, left, right) to reach the goal cell.
+
+        ### Returns:
+            - Cell: The goal cell when the agent traverses the path from its cell.
+        """
+        current = self.cell
+        for direction_str in path:
+            distance = 1
+            if "_" in direction_str:
+                direction_str, distance_str = direction_str.split("_")
+                distance = int(distance_str)
+            direction = Direction(direction_str)
+            current = self.grid.get_neighbor(current, direction, distance)
+        return current
 
     def get_nearest_goal(self, cell:Cell=None) -> Cell:
         """

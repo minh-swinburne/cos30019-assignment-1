@@ -143,7 +143,7 @@ def profile(func):
 
 
 if __name__ == "__main__":
-    result = grid_size, agent_loc, goal_locs, walls = load_map("map_8.txt")
+    result = grid_size, agent_loc, goal_locs, walls = load_map("map_10.txt")
     print_map(*result)
     print("Available maps:", get_available_maps())
     print("Available algorithms:", get_available_algorithms())

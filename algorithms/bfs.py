@@ -2,7 +2,7 @@
 Breadth-First Search (BFS) Algorithm (uninformed)
 
 ## Functions:
-    - search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int: Perform breadth-first search to find the shortest path from the agent's location to the nearest goal or all goals.
+    - search(agent:Agent, all:bool=False) -> dict[list[str], Cell, int] | int: Perform breadth-first search to find the shortest path from the agent's location to the nearest goal or all goals.
 
 ## Main idea:
     The breadth-first search algorithm is an uninformed search algorithm that explores all the nodes at the present depth before moving on to the nodes at the next depth level. It uses a queue to keep track of the nodes to be explored.
@@ -12,9 +12,10 @@ Breadth-First Search (BFS) Algorithm (uninformed)
     The algorithm can be used to find the shortest path to the nearest goal or all goals in the grid. If the agent can jump over obstacles, the algorithm will consider all valid neighbors of the current cell, regardless of their costs.
 """
 from collections import deque
+from classes import *
 
 
-def search(agent:'Agent', all:bool=False) -> dict[str, list[str] | 'Cell' | int] | int:
+def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int:
     """
     Perform breadth-first search to find the shortest path from the agent's location to the nearest goal or all goals.
 

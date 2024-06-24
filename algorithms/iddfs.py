@@ -2,8 +2,8 @@
 Iterative Deepening Depth-First Search (IDDFS) Algorithm (uninformed)
   
 ## Functions:
-    - dls(agent:'Agent', current:'Cell', depth:int, visited:set, count:int, limit:int) -> dict[bool, int]: Perform depth-limited search to find the shortest path from the current cell to the target cell.
-    - search(agent:'Agent', all:bool=False limit: int=10**5) -> dict[list[str], 'Cell', int] | int: Perform iterative deepening depth-first search to find the shortest path from the agent's location to the nearest goal or all goals.
+    - dls(agent:Agent, current:Cell, depth:int, visited:set, count:int, limit:int) -> dict[str, bool | int | Cell]: Perform depth-limited search to find the shortest path from the current cell to the target cell.
+    - search(agent:Agent, all:bool=False limit: int=10**5) -> dict[str, list[str] | Cell | int] | int: Perform iterative deepening depth-first search to find the shortest path from the agent's location to the nearest goal or all goals.
 
 ## Main idea:
     The iterative deepening depth-first search algorithm is an uninformed search algorithm that combines the benefits of depth-first search and breadth-first search. It performs depth-limited search with increasing depth limits until the goal is found. The algorithm continues until it finds a goal cell or the maximum depth is reached.
@@ -13,9 +13,10 @@ Iterative Deepening Depth-First Search (IDDFS) Algorithm (uninformed)
     The algorithm also includes a limit parameter to stop the search if the number of visited cells exceeds the limit.
 """
 import copy
+from classes import *
 
 
-def dls(agent:'Agent', current:'Cell', depth:int, visited:set, count:int, limit:int) -> dict[bool, int] | dict[bool, int, 'Cell']:
+def dls(agent:Agent, current:Cell, depth:int, visited:set, count:int, limit:int) -> dict[str, bool | int | Cell]:
     """
     Perform depth-limited search to find the shortest path from the current cell to the target cell.
 
@@ -79,7 +80,7 @@ def dls(agent:'Agent', current:'Cell', depth:int, visited:set, count:int, limit:
     }
 
 
-def search(agent:'Agent', all:bool=False, limit:int=10**5) -> dict[list[str], 'Cell', int] | int:
+def search(agent:Agent, all:bool=False, limit:int=10**5) -> dict[str, list[str] | Cell | int] | int:
     """
     Perform iterative deepening depth-first search to find the shortest path from the agent's location to a goal.
 

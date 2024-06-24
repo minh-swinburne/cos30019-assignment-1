@@ -2,7 +2,7 @@
 Greedy Best-First Search Algorithm (informed)
 
 ## Functions:
-    - search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int: Perform greedy search to find the (seemingly) shortest path from the agent's location to the (seemingly) nearest goal or all goals.
+    - search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int: Perform greedy search to find the (seemingly) shortest path from the agent's location to the (seemingly) nearest goal or all goals.
   
 ## Main idea:
     The greedy best-first search algorithm is an informed search algorithm that explores the search space based on the heuristic value of each cell, which is the Manhattan distance from the cell to a goal. It uses a priority queue to keep track of the cells to be explored.
@@ -12,9 +12,10 @@ Greedy Best-First Search Algorithm (informed)
     The algorithm can be used to find the seemingly shortest path to the seemingly nearest goal or all goals in the grid. If the agent can jump over obstacles, the algorithm will consider all valid neighbors of the current cell, and then choose the neighbor with lowest Manhattan distance to the current goal as the next cell, regardless of the cost to reach it.
 """
 import heapq
+from classes import *
 
 
-def search(agent:'Agent', all:bool = False) -> dict[list[str], 'Cell', int] | int:
+def search(agent:Agent, all:bool = False) -> dict[str, list[str] | Cell | int] | int:
     """
     Perform greedy search (informed) to find the shortest path from the agent's location to the goal.
 
@@ -46,7 +47,7 @@ def search(agent:'Agent', all:bool = False) -> dict[list[str], 'Cell', int] | in
 
     # open_list = [start]
     # Use a heap as a priority queue
-    open_list:list[tuple[int, 'Cell']] = []
+    open_list:list[tuple[int, Cell]] = []
     # Push the start cell with its h value to the heap
     heapq.heappush(open_list, (start.h, start))
     closed_set = set()

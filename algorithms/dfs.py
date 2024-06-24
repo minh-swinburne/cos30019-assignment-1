@@ -2,7 +2,7 @@
 Depth-First Search (DFS) Algorithm (uninformed)
 
 ## Functions:
-    - search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int: Perform depth-first search to find a path (not necessarily the shortest) from the agent's location to one of the goals (not necessarily the nearest) or all goals.
+    - search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int: Perform depth-first search to find a path (not necessarily the shortest) from the agent's location to one of the goals (not necessarily the nearest) or all goals.
 
 ## Main idea:
     The depth-first search algorithm is an uninformed search algorithm that explores the deepest nodes in the search tree first. It uses a stack to keep track of the nodes to be explored.
@@ -12,9 +12,10 @@ Depth-First Search (DFS) Algorithm (uninformed)
     The algorithm can be used to find a path to one of the goals or all goals in the grid. If the agent can jump over obstacles, the algorithm will consider all valid neighbors of the current cell, regardless of their costs.
 """
 from collections import deque
+from classes import *
 
 
-def search(agent:'Agent', all:bool=False) -> dict[list[str], 'Cell', int] | int:
+def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int:
     """
     Perform depth-first search to find the shortest path from the agent's location to one of the goals (not necessarily the nearest).
 

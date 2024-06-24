@@ -15,4 +15,10 @@ class Direction(Enum):
     LEFT = "left"
     DOWN = "down"
     RIGHT = "right"
-    
+
+
+if __name__ == "__main__":
+    print(Direction.UP)  # Output: "Direction.UP"
+    print(Direction("left"))  # Output: "Direction.LEFT"
+    print(Direction.DOWN.name)  # Output: "DOWN"
+    print(Direction.RIGHT.value)  # Output: "right"

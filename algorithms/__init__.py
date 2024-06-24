@@ -9,12 +9,12 @@ Uninformed search algorithms:
     - Iterative Deepening Depth-First Search (IDDFS)
 
 Informed search algorithms:
-    - A* Search (Astar)
-    - Greedy Best-First Search (Greedy)
-    - Bidirectional A* Search (Bidirectional)
+    - A* Search (AStar)
+    - Greedy Best-First Search (GBFS)
+    - Bidirectional A* Search (Bi-AStar)
 """
 uninformed = ["bfs", "dfs", "iddfs"]
-informed = ["astar", "greedy", "bidirectional"]
+informed = ["astar", "greedy", "bi_astar"]
 
 __all__ = uninformed + informed
 
@@ -23,4 +23,4 @@ from . import dfs
 from . import astar
 from . import greedy
 from . import iddfs
-from . import bidirectional
+from . import bi_astar
