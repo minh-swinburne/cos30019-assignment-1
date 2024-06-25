@@ -74,7 +74,7 @@
   * `astar` for A* Search
   * `bi_astar` for Bidirectional A* Search
 
-### Options
+### Command options
 
   * `-a`: Search for all goals
   * `-j`: Agent can jump over obstacles i.e. walls
