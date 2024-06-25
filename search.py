@@ -14,10 +14,6 @@ ALLOWED_TAGS = {
 
 # Get system arguments
 args = sys.argv
-# args = ["search.py", "RobotNav-test.txt", "astar"]
-# # args += ["-a"]
-# # args += ["-j"]
-# args += ["-l", "10000"]
 
 # Process the system arguments
 try:
@@ -59,7 +55,6 @@ try:
     # Import the desired search algorithm from the algorithms package
     algorithm = import_module(name="algorithms." + algorithm_name)
 
-    # search_type = "search_jps" if "-j" in args else search_type
     limit = 0
 
     # If the search algorithm is IDDFS, get the limit of visited cells
