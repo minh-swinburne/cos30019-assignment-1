@@ -21,6 +21,6 @@ __all__ = uninformed + informed
 from . import bfs
 from . import dfs
 from . import astar
-from . import greedy
+from . import gbfs
 from . import iddfs
-from . import bi_astar
+from . import bass

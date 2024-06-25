@@ -1,5 +1,5 @@
 """
-Bidirectional A* Search algorithm (informed)
+Bidirectional A* Search (BASS) algorithm (informed)
 
 ## Functions:
     - connect(agent:Agent, start:Cell, goal:Cell) -> None: Connect the path from the start cell to the goal cell.

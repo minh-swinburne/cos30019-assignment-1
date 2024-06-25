@@ -3,6 +3,7 @@ from classes import *
 from utils import *
 from importlib import import_module
 
+
 def space(agent, algorithm, all):
     tracemalloc.reset_peak()
     tracemalloc.clear_traces()
@@ -62,13 +63,14 @@ def analyze(map_file, algorithm_str, all, can_jump, number):
     avg_time = time(map_file, algorithm_str, all, can_jump, number)
     print(f"\t- Time: {avg_time:.4f} milliseconds (average of {number} runs)")
 
+
 args = sys.argv
 
-map_file = ""
-algorithm_str = ""
+map_file = FILENAME
+algorithm_str = "bfs"
 all = False
 can_jump = False
-number = 10
+number = 100
 
 if len(args) > 1:
     map_file = args[1]
@@ -81,12 +83,5 @@ if "-j" in args:
 if "-n" in args:
     index = args.index("-n")
     number = int(args[index+1])
-
-map_file = FILENAME
-map_file = "map_7.txt"
-algorithm_str = "bfs"
-all = True
-can_jump = True
-number = 100
 
 analyze(map_file, algorithm_str, all, can_jump, number)

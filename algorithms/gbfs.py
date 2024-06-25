@@ -1,5 +1,5 @@
 """
-Greedy Best-First Search Algorithm (informed)
+Greedy Best-First Search (GBFS) Algorithm (informed)
 
 ## Functions:
     - search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | int: Perform greedy search to find the (seemingly) shortest path from the agent's location to the (seemingly) nearest goal or all goals.
