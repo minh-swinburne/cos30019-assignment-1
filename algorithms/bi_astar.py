@@ -86,8 +86,8 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
     # Initialize the h value for the start cell
     start.h = goal.h = start.manhattan_distance(goal)
 
-    # Use a list as a priority
-    # open_list_start = [start]queue
+    # Use a list as a priority queue
+    # open_list_start = [start]
     # open_list_goal = [goal]
 
     # Use a heap as a priority queue
@@ -238,77 +238,3 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
                 heapq.heapify(open_list_goal)
     # If no path is found, return the count of visited cells
     return count
-
-
-if __name__ == "__main__":
-    setup = """
-import sys, os
-
-directory = os.path.dirname(os.path.dirname(__file__))
-sys.path.append(directory)
-
-from classes import Cell, Grid, Agent
-from utils import load_map
-from __main__ import search
-    """
-    setup_3 = """
-agent.can_jump = True
-    """
-    
-    import sys, os, timeit
-
-    directory = os.path.dirname(os.path.dirname(__file__))
-    sys.path.append(directory)
-
-    from classes import *
-    from utils import *
-
-    maps = []
-    # maps.append("map_2.txt")
-    # maps.append("map_5.txt")
-    # maps.append("map_6.txt")
-    # maps.append("map_7.txt")
-    # maps.append("map_8.txt")
-    # maps.append("map_9.txt")
-    maps = get_available_maps()
-    for file in maps:
-        print(file)
-        grid_size, agent_loc, goal_locs, walls = load_map(file)
-        map = Grid(grid_size, walls)
-        agent = Agent(map, agent_loc, goal_locs)
-        print_map(grid_size, agent_loc, goal_locs, walls)
-        
-        setup_2 = f"""
-grid_size, agent_loc, goal_locs, walls = load_map('{file}')
-grid_map = Grid(grid_size, walls)
-agent = Agent(grid_map, agent_loc, goal_locs)
-        """
-        number = 10
-        
-        result = search(agent)
-        print("\nSearch:", result)
-        if type(result) == dict:
-            print("Goal:", agent.traverse_path(result['path']))
-        # print(f"Time: {timeit.timeit("search(agent)", setup=setup+setup_2, number=number)*1000/number} milliseconds (average of {number} runs)")
-        
-        result = search(agent, all=True)
-        print("\nSearch All:", result)
-        if type(result) == dict:
-            print("Goal:", agent.traverse_path(result['path']))
-        # print(f"Time: {timeit.timeit("search(agent, all=True)", setup=setup+setup_2, number=number)*1000/number} milliseconds (average of {number} runs)\nPath Length: {len(result['path']) if type(result) == dict else 0}")
-        
-        print("Enabled Jumping\n")
-        agent.can_jump = True
-        result = search(agent)
-        print("\nSearch:", result)
-        if type(result) == dict:
-            print("Goal:", agent.traverse_path(result['path']))
-        # print(f"Time: {timeit.timeit("search(agent)", setup=setup+setup_2+setup_3, number=number)*1000/number} milliseconds (average of {number} runs)")
-        
-        result = search(agent, all=True)
-        print("\nSearch All:", result)
-        if type(result) == dict:
-            print("Goal:", agent.traverse_path(result['path']))
-        # print(f"Time: {timeit.timeit("search(agent, all=True)", setup=setup+setup_2+setup_3, number=number)*1000/number} milliseconds (average of {number} runs)")
-        
-        # break
