@@ -1,4 +1,4 @@
-# COS30019 Assignment 1 * Tree Based Search for Robot Navigation Problem
+# COS30019 Assignment 1 - Tree Based Search for Robot Navigation Problem
 
 ## Introduction
 
@@ -7,10 +7,10 @@
 ### General Information
 
   * Programming language: Python 3.12.0
-  * The original objective is to reach one of the green cells.
-  * The program has an option to find path for ALL goals.
-  * The agent has an optional ability to jump over obstacles.
   * The program is designed to be executed with a CLI (e.g. Powershell for Windows).
+  * The original objective is to reach one of the green cells. However, the program has an option to find a path for **all** goals.
+  * The agent is aware of all features of the environment (goal locations, walls...). It can move in **four** directions: UP, LEFT, DOWN and RIGHT.
+  * The agent has an optional ability to jump over obstacles, with the jump cost increasing exponentially with the distance.
 
 ### Implemented Search Algorithms
 
