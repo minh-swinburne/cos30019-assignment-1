@@ -6,7 +6,7 @@ from classes import *
 # Function to import needed search algorithm
 from importlib import import_module
 
-ALLOWED_TAGS = {
+OPTIONS = {
     "-a": "Search all goals",
     "-j": "Agent can jump over obstacles",
     "-l": "Limit of visited cells for IDDFS (or you can specify this when prompted afterwards)"
@@ -21,26 +21,26 @@ try:
     filename = args[1]
 
     if filename == "help":
-        print("\nTree Based Search for Robot Navigation Problem - CLI Help\n")
+        print("\nTree Based Search for Robot Navigation Problem - CLI Help")
+        
+        print("\nCommand Format: 'python search.py <filename> <algorithm> [option]*'")
 
-        print("Available search algorithms:")
+        print("\nAvailable search algorithms:")
         for alg in get_available_algorithms():
             print("\t-", alg)
 
-        print("\nAvailable map files:")
+        print("\nAvailable map files (in folder maps/):")
         for file in get_available_maps():
             print("\t-", file)
 
-        print("\nTags:")
-        for tag, desc in ALLOWED_TAGS.items():
-            print(f"\t{tag}: {desc}")
+        print("\nOptions:")
+        for option, desc in OPTIONS.items():
+            print(f"\t{option}: {desc}")
 
-        print(
-            "\nCommand Format: 'python search.py <filename> <algorithm> [tags]'")
-        print("Example:\
-      \n\t'python search.py RobotNav-test.txt dfs',\
-      \n\t'python search.py .\\map_2.txt iddfs -l 10000',\
-      \n\t'python search.py no_goal.txt bfs -a -j'")
+        print("\nExamples:\
+      \n\t'python search.py RobotNav-test.txt dfs' - Use DFS to search for one goal in map RobotNav-test.txt, no jump;\
+      \n\t'python search.py map_2.txt iddfs -l 10000' - Use IDDFS to search for one goal in map map_2.txt, no jump, maximum 10,000 search nodes;\
+      \n\t'python search.py no_goal.txt bfs -a -j' - Use BFS to search for all goals in map no_goal.txt, agent can jump.")
 
         print()
         sys.exit()
