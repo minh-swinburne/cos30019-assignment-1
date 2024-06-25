@@ -3,7 +3,7 @@ Iterative Deepening Depth-First Search (IDDFS) Algorithm (uninformed)
   
 ## Functions:
     - dls(agent:Agent, current:Cell, depth:int, visited:set, count:int, limit:int) -> dict[str, bool | int | Cell]: Perform depth-limited search to find the shortest path from the current cell to the target cell.
-    - search(agent:Agent, all:bool=False limit: int=10**5) -> dict[str, list[str] | Cell | int] | int: Perform iterative deepening depth-first search to find the shortest path from the agent's location to the nearest goal or all goals.
+    - search(agent:Agent, all:bool=False limit: int=10**6) -> dict[str, list[str] | Cell | int] | int: Perform iterative deepening depth-first search to find the shortest path from the agent's location to the nearest goal or all goals.
 
 ## Main idea:
     The iterative deepening depth-first search algorithm is an uninformed search algorithm that combines the benefits of depth-first search and breadth-first search. It performs depth-limited search with increasing depth limits until the goal is found. The algorithm continues until it finds a goal cell or the maximum depth is reached.
@@ -80,14 +80,14 @@ def dls(agent:Agent, current:Cell, depth:int, visited:set, count:int, limit:int)
     }
 
 
-def search(agent:Agent, all:bool=False, limit:int=10**5) -> dict[str, list[str] | Cell | int] | int:
+def search(agent:Agent, all:bool=False, limit:int=10**6) -> dict[str, list[str] | Cell | int] | int:
     """
     Perform iterative deepening depth-first search to find the shortest path from the agent's location to a goal.
 
     ### Args:
         - agent (Agent): The agent object. Can or cannot jump over obstacles.
         - all (bool, optional): True to find the shortest path to all goals; False to find the shortest path to one goal. Default is False.
-        - limit (int, optional): The maximum number of cells to visit during the search before stopping. Set to 0 to disable this. Default is 100,000.
+        - limit (int, optional): The maximum number of cells to visit during the search before stopping. Set to 0 to disable this. Default is 1,000,000.
 
     ### Returns:
         - If a path is found:
@@ -114,6 +114,7 @@ def search(agent:Agent, all:bool=False, limit:int=10**5) -> dict[str, list[str] 
     count = 1  # Start with 1 for the start cell
     path = []
     goals = copy.deepcopy(agent.goals)
+    reached_goals = []
 
     while agent.goals and (count < limit or limit == 0):
         found_goal = False
@@ -125,6 +126,7 @@ def search(agent:Agent, all:bool=False, limit:int=10**5) -> dict[str, list[str] 
             count = result['count']
             if result['success']:
                 goal = result['goal']
+                reached_goals.append(goal)
                 agent.goals.remove(goal)
                 path.extend(agent.trace_path(goal))
                 # If we only need one goal or all goals are reached, return the result immediately
@@ -140,9 +142,17 @@ def search(agent:Agent, all:bool=False, limit:int=10**5) -> dict[str, list[str] 
                 start.reset()
                 found_goal = True
                 break
+            if count >= limit and limit > 0:
+                break
         # If there is no path to any goals, stop the search
         if not found_goal:
             break
-        # If no path is found, return the count of visited cells
+    # If no path is found, return the count of visited cells
     agent.goals = goals
+    if reached_goals:
+        return {
+            'path': path,
+            'goal': f"{reached_goals} (not all)",
+            'count': count
+        }
     return count

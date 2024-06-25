@@ -4,18 +4,21 @@ from utils import *
 from importlib import import_module
 
 
-def space(agent, algorithm, all):
+def space(agent, algorithm, all, limit):
     tracemalloc.reset_peak()
     tracemalloc.clear_traces()
     tracemalloc.start()
-    result = algorithm.search(agent, all=all)
+    if algorithm.__name__ == "algorithms.iddfs":
+        result = algorithm.search(agent, all=all, limit=limit)
+    else:
+        result = algorithm.search(agent, all=all)
     memory = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     
     return result, memory[1]
 
 
-def time(map_file, algorithm_str, all, can_jump, number=1000):
+def time(map_file, algorithm_str, all, can_jump, limit, number=1000):
     setup = f"""
 import sys, os
 
@@ -32,15 +35,19 @@ grid_map = Grid(grid_size, walls)
 agent = Agent(grid_map, agent_loc, goal_locs)
 agent.can_jump = {can_jump}
     """
+    stmt = f"algorithm.search(agent, all={all}"
+    if algorithm_str == "iddfs":
+        stmt += f", limit={limit}"
+    stmt += ")"
     
-    return timeit.timeit(f"algorithm.search(agent, all={all})", setup=setup, number=number)*1000/number
+    return timeit.timeit(stmt, setup=setup, number=number)*1000/number
 
 
-def analyze(map_file, algorithm_str, all, can_jump, number):    
+def analyze(map_file, algorithm_str, all, can_jump, limit, number):    
     print("\nInformation:")
     print("\t- Algorithm:", algorithm_str.upper())
     print("\t- Map:", map_file)
-    print("\t- All goals" if all else "One goal", f", agent CAN{'NOT' if not can_jump else ''} jump")
+    print(f"\t- {"All goals" if all else "One goal"}, agent CAN{'NOT' if not can_jump else ''} jump")
     
     grid_size, agent_loc, goal_locs, walls = load_map(map_file)
     grid_map = Grid(grid_size, walls)
@@ -48,7 +55,7 @@ def analyze(map_file, algorithm_str, all, can_jump, number):
     agent.can_jump = can_jump
     algorithm = import_module(name=f"algorithms.{algorithm_str}")
 
-    result, peak_memory = space(agent, algorithm, all)
+    result, peak_memory = space(agent, algorithm, all, limit)
     
     print("\nResult:")
     if type(result) == dict:
@@ -60,17 +67,18 @@ def analyze(map_file, algorithm_str, all, can_jump, number):
         
     print("\nPerformance:")
     print(f"\t- Memory used: {peak_memory:,} B")
-    avg_time = time(map_file, algorithm_str, all, can_jump, number)
+    avg_time = time(map_file, algorithm_str, all, can_jump, limit, number)
     print(f"\t- Time: {avg_time:.4f} milliseconds (average of {number} runs)")
 
 
 args = sys.argv
 
 map_file = FILENAME
-algorithm_str = "bfs"
+algorithm_str = "iddfs"
 all = False
 can_jump = False
 number = 100
+limit = 10**6
 
 if len(args) > 1:
     map_file = args[1]
@@ -83,5 +91,8 @@ if "-j" in args:
 if "-n" in args:
     index = args.index("-n")
     number = int(args[index+1])
+if "-l" in args:
+    index = args.index("-l")
+    limit = int(args[index+1])
 
-analyze(map_file, algorithm_str, all, can_jump, number)
+analyze(map_file, algorithm_str, all, can_jump, limit, number)

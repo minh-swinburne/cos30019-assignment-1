@@ -63,11 +63,11 @@ try:
             limit = int(args[args.index("-l") + 1])
         else:
             limit_str = input(
-                "Enter the limit of number of visited cells (Default 100,000): ").strip()
+                "Enter the limit of number of visited cells (Default 1,000,000): ").strip()
             if limit_str != "" and type(eval(limit_str)) == int:
                 limit = int(limit_str)
             else:
-                limit = 10**5
+                limit = 10**6
 
     if limit != 0:
         result = algorithm.search(agent=agent, limit=limit, all="-a" in args)

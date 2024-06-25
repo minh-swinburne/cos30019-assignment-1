@@ -97,7 +97,6 @@ class Grid:
             
         neighbors = []
         max_f = cell.f
-        # print(f"Cell: {cell} - f: {cell.f}")
         # Add neighbors IN ORDER (up, left, down, right) around the cell
         for direction in list(Direction):
             distance = 1
@@ -106,7 +105,6 @@ class Grid:
                 if neighbor.g > 0:
                     neighbor_f = neighbor.jump_cost(cell) + neighbor.h
                     if neighbor_f > max_f and distance > 2:
-                        # print(f"Neighbor {neighbor} has higher f value {neighbor_f} ({neighbor.jump_cost(cell)} + {neighbor.h}) than the minimum f value {max_f}; Cell: {cell}, jump cost {neighbor.jump_cost(cell)}.")
                         break
                     if neighbor.parent is not None:
                         max_f = neighbor_f
@@ -116,18 +114,6 @@ class Grid:
                     break
                 distance += 1
                 neighbor = self.get_neighbor(cell, direction, distance)
-        # neighbors = [self.get_neighbor(cell, direction) for direction in list(Direction)]
-        
-        # for dx, dy in [(0, -1), (-1, 0), (0, 1), (1, 0)]:
-        #     if self.is_valid(cell.x + dx, cell.y + dy):
-        #         neighbors.append(self.grid[cell.y + dy][cell.x + dx])
-
-        # for x in range(-1, 2):  # Loop through the 3x3 grid around the cell
-        #   for y in range(-1, 2):
-        #     if x == 0 and y == 0:
-        #       continue
-        #     if self.is_valid(cell.x + x, cell.y + y):
-        #       neighbors.append(self.grid[cell.y + y][cell.x + x])
 
         return neighbors
 

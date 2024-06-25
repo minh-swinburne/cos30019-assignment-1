@@ -101,25 +101,6 @@ class Cell:
         """
         distance = self.manhattan_distance(other)
         return 2**(distance - 1)
-    
-    # def heuristic(self, goal:'Cell', can_jump:bool=False) -> int:
-    #     """
-    #     Calculate the heuristic value (h) of the cell based on the goal cell.
-        
-    #     ### Args:
-    #         - goal (Cell): The goal cell.
-    #         - can_jump (bool, optional): True if the agent can jump over obstacles; False otherwise. Defaults to False.
-        
-    #     ### Returns:
-    #         - int: The heuristic value (h) of the cell.
-    #     """
-    #     if can_jump:
-    #         if self.x == goal.x or self.y == goal.y:
-    #             return self.jump_cost(goal)
-    #         cell = Cell(goal.x, self.y)
-    #         # print(cell)
-    #         return self.jump_cost(cell) + cell.jump_cost(goal)
-    #     return self.manhattan_distance(goal)
 
     def reset(self):
         """

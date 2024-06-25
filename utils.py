@@ -5,8 +5,7 @@ Functions:
     - load_map(file_name: str) -> Tuple[Tuple[int, int], Tuple[int, int], List[Tuple[int, int]], List[Tuple[int, int, int, int]]]
     - print_map(grid_size: Tuple[int, int], agent_loc: Tuple[int, int], goal_locs: List[Tuple[int, int]], walls: List[Tuple[int, int, int, int]]) -> None
 """
-import os
-import psutil
+import os, random
 # Function to list all modules in a package
 from pkgutil import iter_modules
 
@@ -40,6 +39,16 @@ def get_available_algorithms() -> list[str]:
     alg_dir = os.path.join(directory, "algorithms")
     modules = [name for _, name, _ in iter_modules([alg_dir])]
     return modules
+
+
+def suggest_help():
+    """
+    Suggest the user to use the help option of search.py.
+
+    ### Returns:
+        None
+    """
+    print("\nFor more information, use the help option: 'python search.py help'\n")
 
 
 def load_map(file_name:str=FILENAME) -> tuple[tuple[int,int], tuple[int,int], list[tuple[int,int]], list[tuple[int,int,int,int]]]:
@@ -111,18 +120,36 @@ def print_map(grid_size:tuple[int,int], agent_loc:tuple[int,int], goal_locs:list
     print(end, end="")
 
 
-def suggest_help():
+def generate_map(rows, cols, start, goals, walls, filename):
     """
-    Suggest the user to use the help option of search.py.
+    Generate a map and save it to a text file.
 
+    ### Args:
+        - rows (int): The number of rows in the grid.
+        - cols (int): The number of columns in the grid.
+        - start (tuple[int, int]): The agent's initial location.
+        - goals (list[tuple[int, int]]): A list of goal locations.
+        - walls (list[tuple[int, int, int, int]]): A list of wall locations.
+        - filename (str): The name of the text file to save the map.
+        
     ### Returns:
         None
     """
-    print("\nFor more information, use the help option: 'python search.py help'\n")
+    map_str = f"[{rows},{cols}]\n"
+    map_str += f"({start[0]},{start[1]})\n"
+    goals_str = " | ".join([f"({goal[0]},{goal[1]})" for goal in goals])
+    map_str += f"{goals_str}\n"
+    for wall in walls:
+        map_str += f"({wall[0]},{wall[1]},{wall[2]},{wall[3]})\n"
+    
+    with open(filename, "w") as f:
+        f.write(map_str)
 
 
 if __name__ == "__main__":
-    result = grid_size, agent_loc, goal_locs, walls = load_map("map_14.txt")
-    print_map(*result)
-    print("Available maps:", get_available_maps())
-    print("Available algorithms:", get_available_algorithms())
+    # result = grid_size, agent_loc, goal_locs, walls = load_map("map_14.txt")
+    # print_map(*result)
+    # print("Available maps:", get_available_maps())
+    # print("Available algorithms:", get_available_algorithms())
+    filename = "map_15.txt"
+    generate_map(5, 5, (0, 0), [(4, 4)], [(1, 1, 3, 3)], filename)
