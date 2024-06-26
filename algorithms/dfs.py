@@ -49,14 +49,13 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
     count = 1  # Start with 1 for the start cell
     path = []
     goals = set(agent.goals)
-    reached_goals = set()
-
+    reached_goals = []
     while stack:
         # Pop the last cell from the stack
         current = stack.pop()
         # If the current cell is a goal, tell the agent to return the path
         if current in goals:
-            reached_goals.add(current)
+            reached_goals.append(current)
             goals.remove(current)
             path.extend(agent.trace_path(current))
             # If we only need one goal or all goals are reached, return the result immediately
@@ -73,8 +72,6 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
             current.parent = None
             continue
 
-        # print("Current:", current.location, "- Stack:", [cell.location for cell in stack], "- Neighbors: ", end="")
-
         # Explore all valid neighbors of the current cell (in reverse order to maintain the same direction priority order as BFS)
         for neighbor in agent.grid.get_neighbors(current, agent.can_jump)[::-1]:
             if neighbor not in visited:
@@ -84,7 +81,12 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
                 stack.append(neighbor)
                 visited.add(neighbor)
                 neighbor.parent = current
-                # print(neighbor.location, end=" ")
-        # print()
+    # If some goals are reached, return the result
+    if reached_goals:
+        return {
+            'path': path,
+            'goal': f"{reached_goals} (not all)",
+            'count': count
+        }
     # If no path is found, return the count of visited cells
     return count

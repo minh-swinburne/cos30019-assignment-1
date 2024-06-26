@@ -117,5 +117,12 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
                 neighbor.parent = current
                 # Reheapify the open list after updating the g value
                 heapq.heapify(open_list)
+    # If some goals are reached, return the result
+    if reached_goals:
+        return {
+            'path': path,
+            'goal': f"{reached_goals} (not all)",
+            'count': count
+        }
     # If no path is found, return the count of visited cells
     return count

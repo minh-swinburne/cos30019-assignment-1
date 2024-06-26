@@ -39,13 +39,13 @@ class Cell:
         """
         Compare the cell with another cell based on their locations.
         """
-        return self.x == other.x and self.y == other.y
+        return self.location == other.location
 
     def __hash__(self) -> int:
         """
         Return the hash value of the cell.
         """
-        return hash((self.x, self.y))
+        return hash(self.location)
 
     def __sub__(self, other: 'Cell') -> Direction:
         """

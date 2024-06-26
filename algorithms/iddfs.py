@@ -34,9 +34,7 @@ def dls(agent:Agent, current:Cell, depth:int, visited:set, count:int, limit:int)
             - 'count' (int): The number of cells visited during the search.
             - 'goal' (Cell, optional): The goal cell reached. If the target cell is not found, this key is not included.
     """
-    # print("Depth:", max_depth, "- Current:", current.location, "<= ", current.parent, "- Neighbors: ", map.get_neighbors(current), "- Visited:", visited)
     if current in agent.goals:
-        # print("Found goal:", current.location)
         return {
             'success': True,
             'goal': current,
@@ -59,8 +57,6 @@ def dls(agent:Agent, current:Cell, depth:int, visited:set, count:int, limit:int)
         # Skip blocked cells
         if neighbor in visited:
             continue
-        # print("- Neighbor:", neighbor.location, "- Count:", count)
-        # print("Visited:", visited)
         visited.add(neighbor)
         count += 1
         result = dls(agent, neighbor, depth - 1, visited, count, limit)
@@ -119,8 +115,7 @@ def search(agent:Agent, all:bool=False, limit:int=10**6) -> dict[str, list[str] 
     while agent.goals and (count < limit or limit == 0):
         found_goal = False
         for depth in range(1, max_depth + 1):
-            # print("\nDepth:", depth)
-        # Initialize a set to store visited cells for each depth
+            # Initialize a set to store visited cells for each depth
             visited = {start}
             result = dls(agent, start, depth, visited, count, limit)
             count = result['count']
@@ -147,12 +142,14 @@ def search(agent:Agent, all:bool=False, limit:int=10**6) -> dict[str, list[str] 
         # If there is no path to any goals, stop the search
         if not found_goal:
             break
-    # If no path is found, return the count of visited cells
+    # Reset the goals of the agent
     agent.goals = goals
+    # If some goals are reached, return the result
     if reached_goals:
         return {
             'path': path,
             'goal': f"{reached_goals} (not all)",
             'count': count
         }
+    # If no path is found, return the count of visited cells
     return count

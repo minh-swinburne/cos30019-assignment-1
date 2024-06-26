@@ -84,5 +84,12 @@ def search(agent:Agent, all:bool=False):
                 queue.append(neighbor)
                 visited.add(neighbor)
                 neighbor.parent = current
+    # If some goals are reached, return the result
+    if reached_goals:
+        return {
+            'path': path,
+            'goal': f"{reached_goals} (not all)",
+            'count': count
+        }
     # If no path is found, return the count of visited cells
     return count

@@ -79,8 +79,6 @@ def search(agent:Agent, all:bool = False) -> dict[str, list[str] | Cell | int] |
                 }
 
             # Reset the search state for the next goal
-            # agent.grid.reset()
-            # current.reset()
             for cell in closed_set:
                 cell.reset()
             for _, cell in open_list:
@@ -105,5 +103,12 @@ def search(agent:Agent, all:bool = False) -> dict[str, list[str] | Cell | int] |
                 # open_list.append(neighbor)
                 # Push the neighbor cell with its h value to the heap
                 heapq.heappush(open_list, (neighbor.h, neighbor))
+    # If some goals are reached, return the result
+    if reached_goals:
+        return {
+            'path': path,
+            'goal': f"{reached_goals} (not all)",
+            'count': count
+        }
     # If no path is found, return the count of visited cells
     return count

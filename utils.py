@@ -73,9 +73,11 @@ def load_map(file_name:str=FILENAME) -> tuple[tuple[int,int], tuple[int,int], li
         agent_loc = f.readline().strip()    # This is a tuple of agent's initial location
         agent_loc = eval(agent_loc)
 
-        goal_locs = f.readline().strip().split(
-            '|')    # This is a list of goal locations
-        goal_locs = list(map(eval, goal_locs))
+        goal_locs = f.readline().strip()    # This is a list of goal locations
+        if goal_locs:
+            goal_locs = list(map(eval, goal_locs.split('|')))
+        else:
+            goal_locs = []
 
         walls = []                      # This is a list of wall locations
         wall = f.readline().strip()
@@ -142,14 +144,39 @@ def generate_map(rows, cols, start, goals, walls, filename):
     for wall in walls:
         map_str += f"({wall[0]},{wall[1]},{wall[2]},{wall[3]})\n"
     
-    with open(filename, "w") as f:
+    with open(os.path.join("maps", filename), "w") as f:
         f.write(map_str)
 
 
 if __name__ == "__main__":
-    # result = grid_size, agent_loc, goal_locs, walls = load_map("map_14.txt")
-    # print_map(*result)
     # print("Available maps:", get_available_maps())
     # print("Available algorithms:", get_available_algorithms())
-    filename = "map_15.txt"
-    generate_map(5, 5, (0, 0), [(4, 4)], [(1, 1, 3, 3)], filename)
+    
+    # filename = "map_18.txt"
+    filename = "no_goal_2.txt"
+    height = 100
+    width = 150
+    start = (0, 0)
+    goals = [(width-1, height-1), (width*3//4, height//5)]
+    walls = []
+    for _ in range(height*width//5):
+        while True:
+            direction = random.choice(["horizontal", "vertical"])
+            cols = random.randint(1, 5) if direction == "horizontal" else 1
+            rows = random.randint(1, 5) if direction == "vertical" else 1
+            wall = (random.randint(0, width-cols), random.randint(0, height-rows), cols, rows)
+            collapsed = False
+            if wall[0] <= start[0] < wall[0] + wall[2] and wall[1] <= start[1] < wall[1] + wall[3]:
+                collapsed = True
+            for goal in goals:
+                if wall[0] <= goal[0] < wall[0] + wall[2] and wall[1] <= goal[1] < wall[1] + wall[3]:
+                    collapsed = True
+            if not collapsed:
+                walls.append(wall)
+                break
+    
+    # generate_map(height, width, start, goals, walls, filename)
+    result = grid_size, agent_loc, goal_locs, walls = load_map(filename)
+    # result = grid_size, agent_loc, goal_locs, walls = load_map("map_10.txt")
+    print(filename)
+    print_map(*result)

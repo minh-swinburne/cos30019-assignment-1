@@ -49,30 +49,34 @@ try:
 
     # Load the map and create the agent
     size, agent_loc, goal_locs, walls = load_map(filename)
-    map = Grid(size, walls)
-    agent = Agent(map, agent_loc, goal_locs, can_jump="-j" in args)
+    
+    if goal_locs:
+        map = Grid(size, walls)
+        agent = Agent(map, agent_loc, goal_locs, can_jump="-j" in args)
 
-    # Import the desired search algorithm from the algorithms package
-    algorithm = import_module(name="algorithms." + algorithm_name)
+        # Import the desired search algorithm from the algorithms package
+        algorithm = import_module(name="algorithms." + algorithm_name)
 
-    limit = 0
+        limit = 0
 
-    # If the search algorithm is IDDFS, get the limit of visited cells
-    if algorithm.__name__ == "algorithms.iddfs":
-        if "-l" in args:
-            limit = int(args[args.index("-l") + 1])
-        else:
-            limit_str = input(
-                "Enter the limit of number of visited cells (Default 1,000,000): ").strip()
-            if limit_str != "" and type(eval(limit_str)) == int:
-                limit = int(limit_str)
+        # If the search algorithm is IDDFS, get the limit of visited cells
+        if algorithm.__name__ == "algorithms.iddfs":
+            if "-l" in args:
+                limit = int(args[args.index("-l") + 1])
             else:
-                limit = 10**6
+                limit_str = input(
+                    "Enter the limit of number of visited cells (Default 1,000,000): ").strip()
+                if limit_str != "" and type(eval(limit_str)) == int:
+                    limit = int(limit_str)
+                else:
+                    limit = 10**6
 
-    if limit != 0:
-        result = algorithm.search(agent=agent, limit=limit, all="-a" in args)
+        if limit != 0:
+            result = algorithm.search(agent=agent, limit=limit, all="-a" in args)
+        else:
+            result = algorithm.search(agent=agent, all="-a" in args)
     else:
-        result = algorithm.search(agent=agent, all="-a" in args)
+        result = 0
 
     # Print the result of the search
     print(filename, algorithm_name)

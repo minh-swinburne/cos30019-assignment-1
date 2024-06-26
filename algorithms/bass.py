@@ -86,10 +86,6 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
     # Initialize the h value for the start cell
     start.h = goal.h = start.manhattan_distance(goal)
 
-    # Use a list as a priority queue
-    # open_list_start = [start]
-    # open_list_goal = [goal]
-
     # Use a heap as a priority queue
     open_list_start:list[Cell] = []
     heapq.heappush(open_list_start, start)
@@ -109,21 +105,21 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
     parents_start:dict[Cell, Cell] = {}
     parents_goal:dict[Cell, Cell] = {}
 
-    while open_list_start and open_list_goal:
+    while open_list_start or open_list_goal:
         # Update the current start and goal cells
-        # current_start = min(open_list_start, key=lambda cell: cell.f)
-        # open_list_start.remove(current_start)
-        # current_goal = min(open_list_goal, key=lambda cell: cell.f)
-        # open_list_goal.remove(current_goal)
-        current_start = heapq.heappop(open_list_start)
-        current_goal = heapq.heappop(open_list_goal)
+        if open_list_start:
+            current_start = heapq.heappop(open_list_start)
+            closed_set_start.add(current_start)
+        if open_list_goal:
+            current_goal = heapq.heappop(open_list_goal)
+            closed_set_goal.add(current_goal)
         
-        if current_goal.location in [(4,2)]:
-            pass
-        
-        closed_set_start.add(current_start)
-        closed_set_goal.add(current_goal)
-        
+        # Another goal was reached
+        if current_start in goals and current_start != goal:
+            goal = collapse_goal = current_start
+            collapse_start = current_start.parent
+            
+        # Check for a collapse of the two closed sets
         if current_start in closed_set_goal:
             collapse_start = current_start
             if current_start in parents_goal:
@@ -162,8 +158,6 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
                 connect(agent, collapse_goal, collapse_start)
                 path_goal = agent.trace_path(collapse_start, backward=False)
                 path.extend(path_start + path_goal)
-            else:
-                pass
             
             if not all or not goals:
                 return {
@@ -191,50 +185,59 @@ def search(agent:Agent, all:bool=False) -> dict[str, list[str] | Cell | int] | i
             parents_goal = {}
             continue
 
-        # Explore the neighbors of the current start
-        for neighbor in agent.grid.get_neighbors(current_start, agent.can_jump):
-            if neighbor in closed_set_start:
-                continue
+        if current_start:
+            # Explore the neighbors of the current start
+            for neighbor in agent.grid.get_neighbors(current_start, agent.can_jump):
+                if neighbor in closed_set_start:
+                    continue
 
-            tentative_g = current_start.g + current_start.jump_cost(neighbor)
-            if neighbor not in open_list_start:
-                count += 1
-                # Update the g and h values, and parent for the neighbor cell
-                neighbor.g = tentative_g
-                neighbor.h = neighbor.manhattan_distance(goal)
-                if neighbor.parent is not None and neighbor.parent in closed_set_goal:
-                    parents_goal[neighbor] = neighbor.parent
-                neighbor.parent = current_start
-                # Add the neighbor to the open list
-                # open_list_start.append(neighbor)
-                heapq.heappush(open_list_start, neighbor)
-            elif tentative_g < neighbor.g:
-                neighbor.g = tentative_g
-                if neighbor.parent is not None and neighbor.parent in closed_set_goal:
-                    parents_goal[neighbor] = neighbor.parent
-                neighbor.parent = current_start
-                # Reheapify the open list after updating the g value
-                heapq.heapify(open_list_start)
+                tentative_g = current_start.g + current_start.jump_cost(neighbor)
+                if neighbor not in open_list_start:
+                    count += 1
+                    # Update the g and h values, and parent for the neighbor cell
+                    neighbor.g = tentative_g
+                    neighbor.h = neighbor.manhattan_distance(goal)
+                    if neighbor.parent is not None and neighbor.parent in closed_set_goal:
+                        parents_goal[neighbor] = neighbor.parent
+                    neighbor.parent = current_start
+                    # Add the neighbor to the open list
+                    # open_list_start.append(neighbor)
+                    heapq.heappush(open_list_start, neighbor)
+                elif tentative_g < neighbor.g:
+                    neighbor.g = tentative_g
+                    if neighbor.parent is not None and neighbor.parent in closed_set_goal:
+                        parents_goal[neighbor] = neighbor.parent
+                    neighbor.parent = current_start
+                    # Reheapify the open list after updating the g value
+                    heapq.heapify(open_list_start)
 
-        for neighbor in agent.grid.get_neighbors(current_goal, agent.can_jump):
-            if neighbor in closed_set_goal:
-                continue
+        if current_goal:
+            for neighbor in agent.grid.get_neighbors(current_goal, agent.can_jump):
+                if neighbor in closed_set_goal:
+                    continue
 
-            tentative_g = current_goal.g + current_goal.jump_cost(neighbor)
-            if neighbor not in open_list_goal:
-                count += 1
-                neighbor.g = tentative_g
-                neighbor.h = neighbor.manhattan_distance(start)
-                if neighbor.parent is not None and neighbor.parent in closed_set_start:
-                    parents_start[neighbor] = neighbor.parent
-                neighbor.parent = current_goal
-                # open_list_goal.append(neighbor)
-                heapq.heappush(open_list_goal, neighbor)
-            elif tentative_g < neighbor.g:
-                neighbor.g = tentative_g
-                if neighbor.parent is not None and neighbor.parent in closed_set_start:
-                    parents_start[neighbor] = neighbor.parent
-                neighbor.parent = current_goal
-                heapq.heapify(open_list_goal)
+                tentative_g = current_goal.g + current_goal.jump_cost(neighbor)
+                if neighbor not in open_list_goal:
+                    count += 1
+                    neighbor.g = tentative_g
+                    neighbor.h = neighbor.manhattan_distance(start)
+                    if neighbor.parent is not None and neighbor.parent in closed_set_start:
+                        parents_start[neighbor] = neighbor.parent
+                    neighbor.parent = current_goal
+                    # open_list_goal.append(neighbor)
+                    heapq.heappush(open_list_goal, neighbor)
+                elif tentative_g < neighbor.g:
+                    neighbor.g = tentative_g
+                    if neighbor.parent is not None and neighbor.parent in closed_set_start:
+                        parents_start[neighbor] = neighbor.parent
+                    neighbor.parent = current_goal
+                    heapq.heapify(open_list_goal)
+    # If some goals are reached, return the result
+    if reached_goals:
+        return {
+            'path': path,
+            'goal': f"{reached_goals} (not all)",
+            'count': count
+        }
     # If no path is found, return the count of visited cells
     return count

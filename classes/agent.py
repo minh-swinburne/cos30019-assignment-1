@@ -49,7 +49,7 @@ class Agent:
             cell = cell.parent
         return path
     
-    def traverse_path(self, path:list[str]) -> Cell:
+    def traverse_path(self, path:list[str]) -> tuple[Cell, int]:
         """
         Traverse the path from the start cell to the goal cell.
 
@@ -58,13 +58,17 @@ class Agent:
 
         ### Returns:
             - Cell: The goal cell when the agent traverses the path from its cell.
+            - int: The total cost of traversing the path.
         """
         current = self.cell
+        cost = 0
         for direction_str in path:
             distance = 1
             if "_" in direction_str:
                 direction_str, distance_str = direction_str.split("_")
                 distance = int(distance_str)
             direction = Direction(direction_str)
-            current = self.grid.get_neighbor(current, direction, distance)
-        return current
+            neighbor = self.grid.get_neighbor(current, direction, distance)
+            cost += current.jump_cost(neighbor)
+            current = neighbor
+        return current, cost
