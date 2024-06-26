@@ -40,7 +40,7 @@
      python search.py <filename> <algorithm> [option]*
      ```
 
-   Replace `<filename>` with a filename in the ***maps/*** folder, and `<algorithm>` with an algorithm name. You can also provide additional options (`[option]*`) for different kinds of search (to find all goals, or to allow the agent to jump over walls...). Specific allowed algorithm names and options are listed at the end of the instruction.
+   Replace `<filename>` with a filename in the ***maps/*** folder (not including the folder itself), and `<algorithm>` with an algorithm name. You can also provide additional options (`[option]*`) for different kinds of search (to find all goals, or to allow the agent to jump over walls...). Specific allowed algorithm names and options are listed at the end of the instruction.
 
    For example, for BFS search for **all** goals in map file *RobotNav-test.txt* on Windows:
 
@@ -77,3 +77,39 @@
 * `-a`: Search for all goals
 * `-j`: Agent can jump over obstacles i.e. walls
 * `-l <number>`: Limit of visited cells for IDDFS, with `<number>` being a non-negative number (or you can specify this when prompted afterwards)
+
+
+## Algorithm Performance Evaluation
+
+  The `analyze.py` file in the root folder provides a simple tool to evaluate and analyze the performance of the algorithms in terms of result accuracy, efficiency, memory usage, and computation time, utilizing Python packages like timeit and tracemalloc. To run the script, use the command:
+
+  ```
+  python analyze.py [<filename> <algorithm>] [-n <number>] [-l <limit>]
+  ```
+
+  ### Arguments (All optional):
+  
+  * `<filename>`: a map filename in the ***maps/*** folder (default is *RobotNav-test.txt* if left empty).
+  * `<algorithm>`: an algorithm name, as listed above (default is "bfs" if left empty).
+  * `<number>`: the number of times each search should be executed to measure the average computation time from (default is 1000).
+  * `<limit>`: the limit for the IDDFS algorithm, set to 0 if don't want limit (default is 1,000,000).
+
+  ### Output:
+  
+  The chosen algorithm will perform searches in 4 different scenarios, combining these 2 features:
+    * Whether the algorithm is searching for **all** goal or not.
+    * Whether the agent can jump over obstacles or not.
+
+  For each scenario, the search will be performed for the specified number of times, and the results for each scenario will be returned in the following format:
+  ```
+  Information:
+    - Algorithm name
+    - Map filename
+    - Specific scenario
+  Result:
+    - Goals reached and path cost, or no goal reached
+    - Count of explored nodes
+  Performance:
+    - Memory used in bytes
+    - Average computation time in milliseconds
+  ```
